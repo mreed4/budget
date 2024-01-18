@@ -90,14 +90,32 @@ input[type="text"]:focus + label {
   padding: 220px 125px 180px;
 }
 
-.expense-table {
-  display: grid;
-  grid-template-columns: 1fr 150px auto;
+.expense-list {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
 }
 
-.expense-table div {
+.expense-list li {
   border-bottom: 2px solid #313131;
   padding: 16px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.expense-list li > div {
+  display: flex;
+  align-items: center;
+  width: 60%;
+}
+
+.expense-list li > div > span:first-child {
+  width: 200px;
+}
+
+.expense-list li > div > span:last-child {
+  flex: auto;
 }
 
 .delete {

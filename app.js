@@ -13,11 +13,11 @@ function initEventListeners() {
 }
 
 function renderExpenses(expenses) {
-  const expenseTable = document.querySelector(".expense-table");
+  const expenseList = document.querySelector(".expense-list");
 
   expenses.forEach((expense) => {
     const expenseItem = buildExpenseItem(expense);
-    expenseTable.insertAdjacentHTML("beforeend", expenseItem);
+    expenseList.insertAdjacentHTML("beforeend", expenseItem);
   });
 
   return expenses;
@@ -27,25 +27,26 @@ function buildExpenseItem(expense) {
   const { name, amount } = expense;
 
   return `
-      <div class="expense-name">${name}</div>
-      <div class="expense-amount">${amount}</div>
-      <div class="delete">
-        <button name="delete-expense" class="delete-expense">
-          <img src="./images/trash.svg" alt="Delete expense" />
-        </button>
-      </div>`;
+    <li class="expense-item" id="${name.toLowerCase()}">
+      <div>
+        <span class="expense-name">${name}</span>
+        <span class="expense-amount">${formatCurrency(amount)}</span>
+      </div>
+      <button class="delete-expense" aria-label="Delete ${name}">
+        <img src="./images/trash.svg" alt="Delete ${name}" />
+      </button>
+    </li>`;
 }
 
 function updateSummary() {
   const summaryPanel = document.querySelector(".summary-panel");
   const [incomeSummary, expenseSummary, balanceSummary] = summaryPanel.querySelectorAll(".summary-amount");
   const income = Number(document.getElementById("income").value);
-  const expenseItems = [...document.querySelectorAll(".expense-amount")].map((item) => Number(item.textContent));
-  const expense = expenseItems.reduce((acc, item) => acc + item, 0);
-  const balance = income - expense;
+  const expenseTotal = expenses.reduce((acc, item) => acc + item.amount, 0);
+  const balance = income - expenseTotal;
 
   incomeSummary.textContent = formatCurrency(income);
-  expenseSummary.textContent = formatCurrency(expense);
+  expenseSummary.textContent = formatCurrency(expenseTotal);
   balanceSummary.textContent = formatCurrency(balance);
 
   if (balance < 0) {
