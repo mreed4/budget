@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>21 - Simplified Budget || Advent of JavaScript</title>
     <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
   </head>
 
   <body>
@@ -14,14 +15,14 @@
         <h1>Monthly Budget</h1>
         <div class="field">
           <input type="text" name="income" id="income" />
-          <label for="income">Gross yearly income</label>
+          <label for="income">Net monthly income (after taxes, etc.)</label>
         </div>
         <div class="add-expense">
           <h2>Add expense</h2>
           <div>
             <div class="field">
               <input type="text" name="expense-name" id="expense-name" />
-              <label for="expense-name">Expense</label>
+              <label for="expense-name">Description</label>
             </div>
             <div class="field">
               <input type="text" name="expense-amount" id="expense-amount" />
@@ -35,7 +36,7 @@
       </div>
 
       <div class="expenses-panel">
-        <h2>Expenses</h2>
+        <h2>Monthly expenses</h2>
         <ul class="expense-list"></ul>
       </div>
 

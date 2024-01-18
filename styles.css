@@ -14,6 +14,7 @@ body {
   --primary: #51f129;
   --positive: #4ca536;
   --negative: #df1414;
+  --red: var(--negative);
 }
 
 h1 {
@@ -107,7 +108,7 @@ input[type="text"]:focus + label {
   align-items: center;
 }
 
-.expense-list li > div {
+.expense-list li > div.expense-info {
   display: flex;
   align-items: center;
   width: 60%;
@@ -125,10 +126,17 @@ input[type="text"]:focus + label {
   text-align: right;
 }
 
-.delete-expense {
+.expense-list li button {
   background: none;
   border: none;
   cursor: pointer;
+  color: inherit;
+  filter: brightness(0.8);
+  transition: filter 0.3s ease;
+}
+
+.delete-expense:hover {
+  filter: brightness(1);
 }
 
 .summary-panel {
