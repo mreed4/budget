@@ -75,7 +75,10 @@ input[type="text"]:focus + label {
 }
 
 .add-expense {
-  margin: 120px 0;
+  margin: 60px 0 120px;
+}
+
+.add-expense > div {
   display: flex;
   gap: 24px;
 }
