@@ -134,6 +134,7 @@ input[type="text"]:focus + label {
   font-weight: bold;
   font-size: 54px;
   line-height: 81px;
+  transition: color 0.3s ease;
 }
 
 .summary-amount.positive {
