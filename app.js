@@ -14,7 +14,7 @@ function initEventListeners() {
 
   enableExpenseDeletion();
   enableExpenseAddition();
-  // enableExpenseEdit();
+  enableExpenseEdit();
 
   el.expenseNameInput.addEventListener("blur", () => {
     checkDuplicateExpense(el.expenseNameInput.value);
@@ -51,17 +51,15 @@ function buildExpenseItem(expense) {
       </div>
       
       <div class="expense-buttons">
-        
+      <button class="edit-expense" aria-label="Edit ${name}">
+      <span class="material-symbols-outlined">edit</span>
+      </button>
+    
         <button class="delete-expense" aria-label="Delete ${name}">
           <span class="material-symbols-outlined">delete</span>
         </button>
       </div>
     </li>`;
-
-  // <button class="edit-expense" aria-label="Edit ${name}">
-  //       <span class="material-symbols-outlined">edit</span>
-  //     </button>
-
   return listItem;
 }
 
@@ -97,7 +95,7 @@ function addExpense() {
   renderExpense(el.expensesList, buildExpenseItem(newExpense));
   updateSummary();
   enableExpenseDeletion();
-  // enableExpenseEdit();
+  enableExpenseEdit();
 
   // Clear inputs
 
