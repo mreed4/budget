@@ -173,3 +173,13 @@ input[type="text"]:focus + label {
 .summary-amount.negative {
   color: var(--negative);
 }
+
+.hidden {
+  display: none;
+}
+
+button:disabled {
+  opacity: 0.5;
+  pointer-events: none;
+  cursor: default;
+}

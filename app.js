@@ -1,33 +1,27 @@
 import { expenses } from "./data.js";
+import * as el from "./elements.js";
 
 (function init() {
-  renderExpenses(expenses);
+  renderExpenses(expenses); // Initial render
   initEventListeners();
-  updateSummary();
+  updateSummary(); // Initial summary
 })();
 
 function initEventListeners() {
-  const incomeInput = document.querySelector("input#income");
-  const addExpenseButton = document.querySelector(".add-expense-button");
   const expenseNameInput = document.querySelector("input#expense-name");
 
-  incomeInput.addEventListener("input", () => {
-    updateSummary();
-  });
+  enableIncomeInput();
 
-  incomeInput.addEventListener("blur", () => {
-    incomeInput.value = "";
-  });
+  enableExpenseDeletion();
+  enableExpenseAddition();
+  // enableExpenseEdit();
 
-  expenseNameInput.addEventListener("blur", () => {
-    checkDuplicateExpense(expenseNameInput.value);
-  });
-
-  addExpenseButton.addEventListener("click", (event) => {
-    event.preventDefault();
-    addExpense();
+  el.expenseNameInput.addEventListener("blur", () => {
+    checkDuplicateExpense(el.expenseNameInput.value);
   });
 }
+
+// Render and build elements
 
 function renderExpenses(expenses) {
   /* */
@@ -35,18 +29,7 @@ function renderExpenses(expenses) {
 
   expenses.forEach((expense) => {
     const expenseItem = buildExpenseItem(expense);
-    renderExpense(expenseList, expenseItem);
-  });
-
-  const allDeleteButtons = expenseList.querySelectorAll(".delete-expense");
-
-  allDeleteButtons.forEach((button) => {
-    button.addEventListener("click", (event) => {
-      const expenseName = event.target.closest(".expense-item").id;
-      console.log(expenseName);
-      removeExpense(expenseName);
-      updateSummary();
-    });
+    renderExpense(el.expensesList, expenseItem);
   });
 
   return expenses;
@@ -61,41 +44,45 @@ function buildExpenseItem(expense) {
   const { name, amount } = expense;
 
   const listItem = `
-    <li class="expense-item" id="${name.toLowerCase()}">
+    <li class="expense-item" id="${name.toLowerCase().replace(" ", "-")}">
       <div class="expense-info">
         <span class="expense-name">${name}</span>
         <span class="expense-amount">${formatCurrency(amount)}</span>
       </div>
       
       <div class="expense-buttons">
-        <button class="edit-expense" aria-label="Edit ${name}">
-          <span class="material-symbols-outlined">edit</span>
-        </button>
+        
         <button class="delete-expense" aria-label="Delete ${name}">
           <span class="material-symbols-outlined">delete</span>
         </button>
       </div>
     </li>`;
 
+  // <button class="edit-expense" aria-label="Edit ${name}">
+  //       <span class="material-symbols-outlined">edit</span>
+  //     </button>
+
   return listItem;
 }
 
+// Expense management functions
+
 function addExpense() {
   /* */
-  const expenseNameInput = document.getElementById("expense-name");
-  const expenseAmountInput = document.getElementById("expense-amount");
 
-  const name = expenseNameInput.value;
-  const amount = Number(expenseAmountInput.value);
+  const name = el.expenseNameInput.value;
+  const amount = Number(el.expenseAmountInput.value);
 
   const newExpense = { name, amount };
 
-  // Validation
+  // Check for empty or invalid inputs
 
   if (!name || !amount || isNaN(amount)) {
     console.log("Please enter a name and amount for the expense.");
     return;
   }
+
+  // Check for duplicate expense, if true, notify user and return
 
   if (checkDuplicateExpense(name)) {
     return;
@@ -105,85 +92,101 @@ function addExpense() {
 
   expenses.push(newExpense);
 
-  // Render new expense to DOM
+  // Render new expense to DOM, update summary, and enable deletion/edit for new expense
 
-  renderExpense(document.querySelector(".expense-list"), buildExpenseItem(newExpense));
+  renderExpense(el.expensesList, buildExpenseItem(newExpense));
   updateSummary();
+  enableExpenseDeletion();
+  // enableExpenseEdit();
 
   // Clear inputs
 
-  expenseNameInput.value = "";
-  expenseAmountInput.value = "";
+  el.expenseNameInput.value = "";
+  el.expenseAmountInput.value = "";
 }
 
 function removeExpense(expenseName) {
   /* */
   const expenseIndex = expenses.findIndex((expense) => expense.name.toLowerCase() === expenseName);
 
+  // Remove expense from data
   expenses.splice(expenseIndex, 1);
 
   const expenseItem = document.getElementById(expenseName);
 
+  // Remove expense from DOM
   expenseItem.remove();
 }
 
-function updateSummary() {
+function editExpense(expenseName) {
   /* */
-  const summaryPanel = document.querySelector(".summary-panel");
-  const [incomeSummary, expenseSummary, balanceSummary] = summaryPanel.querySelectorAll(".summary-amount");
-  const incomeInput = document.querySelector("input#income");
+  const expenseAmountSpan = document.querySelector(`#${expenseName} .expense-amount`);
+  const savedAmount = Number(expenseAmountSpan.textContent.replace(/[^0-9.-]+/g, ""));
+  const expenseEditButton = document.querySelector(`#${expenseName} .edit-expense`);
 
-  // Calculations
+  // Create and build check button
+  const expenseCheckButton = document.createElement("button");
+  expenseCheckButton.classList.add("confirm-edit");
+  expenseCheckButton.innerHTML = `<span class="material-symbols-outlined">check</span>`;
 
-  const income = updateIncome(incomeInput, incomeSummary);
-  const expenseTotal = updateExpenseTotal(expenses); // Accesses the data.js file
-  const balance = income - expenseTotal;
+  // Create input and set value to saved amount
+  const editExpenseAmountInput = document.createElement("input");
+  editExpenseAmountInput.type = "number";
+  editExpenseAmountInput.value = savedAmount;
 
-  // Update DOM
+  // Replace span with input and edit button with check button
+  expenseAmountSpan.replaceWith(editExpenseAmountInput);
+  expenseEditButton.replaceWith(expenseCheckButton);
 
-  incomeSummary.textContent = formatCurrency(income);
-  balanceSummary.textContent = formatCurrency(balance);
-  expenseSummary.textContent = formatCurrency(expenseTotal);
+  editExpenseAmountInput.addEventListener("blur", (event) => {
+    /* */
+    handleExpenseUpdate(event);
+  });
 
-  // UX for NaN values
+  editExpenseAmountInput.addEventListener("input", (event) => {
+    /* */
+    handleExpenseUpdate(event);
+  });
 
-  if (incomeSummary.textContent.includes("NaN")) {
-    incomeSummary.textContent = formatCurrency(0);
+  expenseCheckButton.addEventListener("click", (event) => {
+    /* */
+    handleExpenseUpdate(event);
+  });
+
+  function handleExpenseUpdate(event) {
+    /* */
+    const newAmount = Number(editExpenseAmountInput.value);
+
+    if (!newAmount || isNaN(newAmount)) {
+      editExpenseAmountInput.replaceWith(expenseAmountSpan);
+      return;
+    }
+
+    // Update DOM and data
+    expenseAmountSpan.textContent = formatCurrency(newAmount);
+
+    // Swap back to original DOM elements
+    if (event && event.type === "blur") {
+      editExpenseAmountInput.replaceWith(expenseAmountSpan);
+      expenseCheckButton.replaceWith(expenseEditButton);
+    }
+
+    if (event && event.type === "input") {
+      console.log({ newAmount, savedAmount });
+    }
+
+    if (event && event.type === "click") {
+      editExpenseAmountInput.replaceWith(expenseAmountSpan);
+      expenseCheckButton.replaceWith(expenseEditButton);
+    }
+
+    // Update data
+    const expenseIndex = expenses.findIndex((expense) => expense.name.toLowerCase() === expenseName);
+    expenses[expenseIndex].amount = newAmount;
+
+    // Update summary
+    updateSummary();
   }
-
-  if (balanceSummary.textContent.includes("NaN")) {
-    balanceSummary.textContent = formatCurrency(0);
-  }
-
-  // Conditionally style balance
-
-  if (balance < 0) {
-    balanceSummary.classList.add("negative");
-  } else {
-    balanceSummary.classList.remove("negative");
-  }
-}
-
-function updateIncome(input, summary) {
-  /* */
-  let income;
-
-  if (input.value) {
-    income = Number(input.value);
-  }
-
-  if (!input.value) {
-    income = Number(summary.textContent.replace(/[^0-9.-]+/g, ""));
-  }
-
-  return income;
-}
-
-function updateExpenseTotal(expenses) {
-  /* */
-  const expenseTotal = expenses.reduce((acc, item) => acc + item.amount, 0);
-
-  return expenseTotal;
 }
 
 function checkDuplicateExpense(name) {
@@ -198,6 +201,116 @@ function checkDuplicateExpense(name) {
   return false;
 }
 
+// Summary logic
+
+function updateSummary() {
+  /* */
+  const [incomeSummary, expenseSummary, balanceSummary] = el.summaryPanel.querySelectorAll(".summary-amount");
+
+  // Calculations
+  const income = updateIncome(el.incomeInput, incomeSummary);
+  const expenseTotal = updateExpenseTotal(expenses); // Accesses the data.js file
+  const balance = income - expenseTotal;
+
+  // Update DOM
+  incomeSummary.textContent = formatCurrency(income);
+  balanceSummary.textContent = formatCurrency(balance);
+  expenseSummary.textContent = formatCurrency(expenseTotal);
+
+  // UX for NaN values
+  if (incomeSummary.textContent.includes("NaN")) {
+    incomeSummary.textContent = formatCurrency(0);
+  }
+
+  if (balanceSummary.textContent.includes("NaN")) {
+    balanceSummary.textContent = formatCurrency(0);
+  }
+
+  // Conditionally style balance
+  if (balance < 0) {
+    balanceSummary.classList.add("negative");
+  } else {
+    balanceSummary.classList.remove("negative");
+  }
+}
+
+function updateIncome(input, summary) {
+  /* */
+  let income;
+
+  // If input is empty, use summary value
+  if (input.value) {
+    income = Number(input.value);
+  }
+
+  // If input is not empty, use input value
+  if (!input.value) {
+    income = Number(summary.textContent.replace(/[^0-9.-]+/g, ""));
+  }
+
+  return income;
+}
+
+function updateExpenseTotal(expenses) {
+  /* */
+  const expenseTotal = expenses.reduce((acc, item) => acc + item.amount, 0);
+
+  return expenseTotal;
+}
+
+// Helper functions
+
 function formatCurrency(amount) {
   return amount.toLocaleString("en-US", { style: "currency", currency: "USD" });
+}
+
+// Event listener registration
+
+function enableExpenseDeletion() {
+  /* */
+  const expenseList = document.querySelector(".expense-list");
+  const deleteButtons = expenseList.querySelectorAll(".delete-expense");
+
+  deleteButtons.forEach((button) => {
+    button.addEventListener("click", (event) => {
+      const expenseName = event.target.closest(".expense-item").id;
+      removeExpense(expenseName);
+      updateSummary();
+    });
+  });
+}
+
+function enableExpenseEdit() {
+  /* */
+  const expenseList = document.querySelector(".expense-list");
+  const editButtons = expenseList.querySelectorAll(".edit-expense");
+
+  editButtons.forEach((button) => {
+    button.addEventListener("click", (event) => {
+      editExpense(event.target.closest(".expense-item").id);
+    });
+  });
+}
+
+function enableExpenseAddition() {
+  /* */
+  const addExpenseButton = document.querySelector(".add-expense-button");
+
+  addExpenseButton.addEventListener("click", (event) => {
+    event.preventDefault();
+    addExpense();
+  });
+}
+
+function enableIncomeInput() {
+  /* */
+  const incomeInput = document.querySelector("input#income");
+
+  incomeInput.addEventListener("input", () => {
+    updateSummary();
+  });
+
+  incomeInput.addEventListener("blur", () => {
+    incomeInput.value = "";
+  });
 }
