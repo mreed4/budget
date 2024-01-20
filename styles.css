@@ -65,7 +65,7 @@ input[type="text"]:focus + label {
 
 .wrapper {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1.25fr 1.5fr;
   grid-gap: 0;
   min-height: 100vh;
 }
