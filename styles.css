@@ -114,12 +114,13 @@ input[type="text"]:focus + label {
   width: 60%;
 }
 
-.expense-list li > div > span:first-child {
+.expense-list li > div > span.expense-name {
   width: 200px;
+  padding-left: 0.75rem;
 }
 
-.expense-list li > div > span:last-child {
-  flex: auto;
+.expense-icon {
+  opacity: 0.5;
 }
 
 .delete {

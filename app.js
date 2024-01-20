@@ -90,79 +90,130 @@ function buildExpenseItem(expense) {
   const listItem = `
     <li class="expense-item" id="${name.toLowerCase().replace(" ", "-")}">
       <div class="expense-info">
+        <span class="expense-icon material-symbols-outlined">${getExpenseIcon() ?? "chevron_right"}</span>
         <span class="expense-name">${name}</span>
         <span class="expense-amount">${formatCurrency(amount)}</span>
       </div>      
       <div class="expense-buttons">
-        <button class="edit-expense" aria-label="Edit ${name}">
+        <button class="edit-expense" aria-label="Edit ${name}" type="button">
           <span class="material-symbols-outlined">edit</span>
         </button>
-        <button class="delete-expense" aria-label="Delete ${name}">
+        <button class="delete-expense" aria-label="Delete ${name}" type="button">
           <span class="material-symbols-outlined">delete</span>
         </button>
       </div>
     </li>`;
 
   return listItem;
+
+  function getExpenseIcon() {
+    /* */
+    if (["rent", "mortgage"].includes(name.toLowerCase())) {
+      return "home";
+    }
+
+    if (["groceries", "food"].includes(name.toLowerCase())) {
+      return "grocery";
+    }
+
+    if (["gas", "fuel"].includes(name.toLowerCase())) {
+      return "local_gas_station";
+    }
+
+    if (["car payment", "car"].includes(name.toLowerCase())) {
+      return "car_tag";
+    }
+  }
 }
 
 function addExpense() {
-  const addExpenseButton = document.querySelector(".add-expense-button");
   /* */
+  const addExpenseButton = document.querySelector(".add-expense-button");
 
-  addExpenseButton.addEventListener("click", () => {
+  addExpenseButton.addEventListener("click", handleAddExpense);
+
+  function handleAddExpense(event) {
+    /* */
     const expenseName = document.querySelector(".add-expense input[name='expense-name']");
     const expenseAmount = document.querySelector(".add-expense input[name='expense-amount']");
+    const domItems = [expenseName, expenseAmount];
 
+    // Create an expense object literal
     const expense = {
       name: expenseName.value,
       amount: Number(expenseAmount.value),
     };
 
+    // Test the expense object
+    const testExpenseResult = testExpense(expense, domItems);
+
+    // If the expense object fails the tests, return
+    if (!testExpenseResult) {
+      return;
+    }
+
+    // If the expense object passes the tests, add it to the budget,
+    // re-render the budget, and clear the input fields
+    budget.expenses.push(expense);
+    renderBudget();
+    domItems.forEach((item) => (item.value = ""));
+  }
+
+  function testExpense(expense, domItems) {
+    /* */
+    const [expenseName, expenseAmount] = domItems;
+
+    // Does the expense already exist?
     if (budget.expenses.find((item) => item.name === expense.name)) {
       console.log("Expense already exists");
       return;
     }
 
+    // Is the expense name empty?
     if (expenseName.value === "") {
       console.log("Please enter an expense name");
+      // TODO: Add a visual cue to the user
       return;
     }
 
+    // Is the expense amount empty?
     if (expenseAmount.value === "") {
       console.log("Please enter an expense amount");
+      // TODO: Add a visual cue to the user
       return;
     }
 
+    // Is the expense amount a number?
     if (isNaN(expense.amount)) {
       console.log("Please enter a valid expense amount");
+      // TODO: Add a visual cue to the user
       return;
     }
 
+    // Is the expense name too short?
     if (expense.name.length < 3) {
       console.log("Please enter a valid expense name");
+      // TODO: Add a visual cue to the user
       return;
     }
 
+    // Is the expense name too long?
     if (expense.name.length > 16) {
       expense.name = expense.name.slice(0, 16) + "...";
     }
 
-    if (expense.amount > 100_000) {
-      expense.amount = 100_000;
-    }
-
+    // Is the expense amount too small?
     if (expense.amount < 0) {
       expense.amount = Math.abs(expense.amount);
     }
 
-    budget.expenses.push(expense);
+    // Is the expense amount too large?
+    if (expense.amount > 100_000) {
+      expense.amount = 100_000;
+    }
 
-    renderBudget();
-
-    expenseName.value = "";
-    expenseAmount.value = "";
-  });
+    return expense;
+  }
 }
 
 function deleteExpense() {
@@ -170,25 +221,22 @@ function deleteExpense() {
   const deleteExpenseButtons = document.querySelectorAll(".delete-expense");
 
   deleteExpenseButtons.forEach((button) => {
-    const handleDeleteButton = button.addEventListener("click", (event) => {
-      const expenseItem = event.target.closest(".expense-item");
-      const expenseName = expenseItem.querySelector(".expense-name").textContent;
-
-      budget.expenses = budget.expenses.filter((expense) => {
-        const expenseFromData = expense.name.toLowerCase().slice(0, expense.name.length - 3);
-        const expenseFromDOM = expenseName.toLowerCase().slice(0, expenseName.length - 3);
-
-        return expenseFromData !== expenseFromDOM;
-      });
-
-      renderBudget();
-    });
-
-    button.removeEventListener("click", () => {
-      console.log("click event removed");
-      handleDeleteButton();
-    });
+    button.addEventListener("click", handleDeleteExpense);
   });
+
+  function handleDeleteExpense(event) {
+    const expenseItem = event.target.closest(".expense-item");
+    const expenseName = expenseItem.querySelector(".expense-name").textContent;
+
+    budget.expenses = budget.expenses.filter((expense) => {
+      const expenseFromData = expense.name.toLowerCase().slice(0, expense.name.length - 3);
+      const expenseFromDOM = expenseName.toLowerCase().slice(0, expenseName.length - 3);
+
+      return expenseFromData !== expenseFromDOM;
+    });
+
+    renderBudget();
+  }
 }
 
 function formatCurrency(amount) {
