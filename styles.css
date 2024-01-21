@@ -4,27 +4,37 @@ body {
   padding: 0;
   margin: 0;
   font-family: "Poppins", sans-serif;
-  background: black;
-  color: white;
+  background: hsl(232, 15.8%, 8.6%);
+  color: #f1eff0;
   min-height: 100vh;
   min-width: 100vw;
+  overflow-x: hidden;
 }
 
 :root {
-  --primary: #51f129;
+  --primary: #f72585;
   --positive: #4ca536;
   --negative: #df1414;
   --red: var(--negative);
+  --need: #e9c46a;
+  --want: #e76f51;
+  --savings: #2a9d8f;
+  --black: hsl(232, 15.8%, 8.6%);
+  --white: #f1eff0;
+  --gray: #323645;
 }
 
 h1 {
   font-size: 3rem;
   font-weight: bold;
+  margin-top: 0;
+  color: var(--primary);
 }
 
 h2 {
   font-size: 1.5rem;
-  color: var(--primary);
+  /* color: var(--primary); */
+  margin-top: 0;
 }
 
 .field {
@@ -42,7 +52,7 @@ label {
 }
 
 input[type="text"] {
-  background: #323645;
+  background: var(--gray);
   border-radius: 16px;
   padding: 35px 20px 15px;
   border: 2px solid transparent;
@@ -50,7 +60,7 @@ input[type="text"] {
   height: 85px;
   box-sizing: border-box;
   font-family: "Poppins", sans-serif;
-  color: white;
+  color: var(--white);
   font-size: 1.25rem;
   outline: none;
 }
@@ -65,14 +75,18 @@ input[type="text"]:focus + label {
 
 .wrapper {
   display: grid;
-  grid-template-columns: 1.25fr 1.5fr;
+  grid-template-columns: 1.25fr 2fr;
   grid-gap: 0;
   min-height: 100vh;
 }
 
 .add-panel {
-  background: #282a37;
-  padding: 170px 125px 180px;
+  background: hsl(232, 15.8%, 18.6%);
+  padding: 2rem;
+}
+
+.add-panel > div {
+  position: sticky;
 }
 
 .add-expense {
@@ -91,7 +105,8 @@ input[type="text"]:focus + label {
 }
 
 .expenses-panel {
-  padding: 220px 125px 180px;
+  padding: 2rem 4rem 20rem;
+  overflow-y: auto;
 }
 
 .expense-list {
@@ -106,25 +121,52 @@ input[type="text"]:focus + label {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  /* font-size: 2rem; */
 }
 
-.expense-list li > div.expense-info {
+.expense-list .expense-info {
   display: flex;
   align-items: center;
   width: 60%;
 }
 
-.expense-list li > div > span.expense-name {
-  width: 200px;
+.expense-list .expense-name-type {
+  width: 300px;
   padding-left: 0.75rem;
+  display: flex;
+  align-items: center;
+}
+
+.expense-list .expense-name {
+  font-weight: bold;
+}
+
+.expense-list .expense-type {
+  font-size: 0.75rem;
+  color: var(--white);
+  display: inline-block;
+  padding: 0.125rem 0.25rem;
+  border-radius: 0.5rem;
+  margin-left: 0.5rem;
+  user-select: none;
+}
+
+.expense-list .expense-type.want {
+  background: var(--want);
+}
+
+.expense-list .expense-type.need {
+  color: var(--black);
+  background: var(--need);
+}
+
+.expense-list .expense-type.savings {
+  background: var(--savings);
 }
 
 .expense-icon {
   opacity: 0.5;
-}
-
-.delete {
-  text-align: right;
+  user-select: none;
 }
 
 .expense-list li button {
@@ -132,17 +174,11 @@ input[type="text"]:focus + label {
   border: none;
   cursor: pointer;
   color: inherit;
-  filter: brightness(0.8);
-  transition: filter 0.3s ease;
-}
-
-.delete-expense:hover {
-  filter: brightness(1);
 }
 
 .summary-panel {
-  background: white;
-  color: black;
+  background: var(--white);
+  color: var(--black);
   position: fixed;
   bottom: 0;
   left: 0;
@@ -150,6 +186,8 @@ input[type="text"]:focus + label {
   padding: 48px 125px;
   display: flex;
   justify-content: space-between;
+  border-radius: 1rem;
+  margin: 1rem;
 }
 
 .summary-label {
@@ -157,7 +195,7 @@ input[type="text"]:focus + label {
   font-weight: bold;
   font-size: 18px;
   line-height: 27px;
-  color: #323645;
+  color: var(--gray);
 }
 
 .summary-amount {
@@ -183,4 +221,9 @@ button:disabled {
   opacity: 0.5;
   pointer-events: none;
   cursor: default;
+}
+
+.add-circle {
+  font-size: 3rem !important;
+  color: var(--primary);
 }

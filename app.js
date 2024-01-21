@@ -85,43 +85,91 @@ function renderExpense(expenseList, expenseItem) {
 
 function buildExpenseItem(expense) {
   /* */
-  const { name, amount } = expense;
+  const { name, amount, type } = expense;
 
   const listItem = `
-    <li class="expense-item" id="${name.toLowerCase().replace(" ", "-")}">
+    <li class="expense-item" id="${kebabCase(name)}">
       <div class="expense-info">
-        <span class="expense-icon material-symbols-outlined">${getExpenseIcon() ?? "chevron_right"}</span>
-        <span class="expense-name">${name}</span>
+        <span class="expense-icon material-symbols-outlined">${getExpenseIcon(name) ?? "chevron_right"}</span>
+        <div class="expense-name-type">
+          <span class="expense-name">${name}</span>
+          <span class="expense-type ${type.toLowerCase()}">${type}</span>
+        </div>
         <span class="expense-amount">${formatCurrency(amount)}</span>
       </div>      
       <div class="expense-buttons">
         <button class="edit-expense" aria-label="Edit ${name}" type="button">
-          <span class="material-symbols-outlined">edit</span>
+          <span class="expense-icon material-symbols-outlined edit">edit</span>
         </button>
         <button class="delete-expense" aria-label="Delete ${name}" type="button">
-          <span class="material-symbols-outlined">delete</span>
+          <span class="expense-icon material-symbols-outlined delete">delete</span>
         </button>
       </div>
     </li>`;
 
   return listItem;
 
-  function getExpenseIcon() {
+  function kebabCase(string) {
     /* */
-    if (["rent", "mortgage"].includes(name.toLowerCase())) {
-      return "home";
+    return string
+      .toLowerCase()
+      .replace(" ", "-")
+      .replace(/[^a-z-]/g, "");
+  }
+
+  function getExpenseIcon(name) {
+    /* */
+    name = kebabCase(name);
+    if (["rent", "mortgage"].includes(name)) {
+      return "cottage";
     }
 
-    if (["groceries", "food"].includes(name.toLowerCase())) {
+    if (["groceries", "food"].includes(name)) {
       return "grocery";
     }
 
-    if (["gas", "fuel"].includes(name.toLowerCase())) {
+    if (["gas-car", "fuel", "gas"].includes(name)) {
       return "local_gas_station";
     }
 
-    if (["car payment", "car"].includes(name.toLowerCase())) {
+    if (["car-payment", "car"].includes(name)) {
       return "car_tag";
+    }
+
+    if (["insurance"].includes(name)) {
+      return "description";
+    }
+
+    if (["electricity", "power", "electric"].includes(name)) {
+      return "electric_meter";
+    }
+
+    if (["phone", "cell", "cell-phone", "phone-bill"].includes(name)) {
+      return "phone_in_talk";
+    }
+
+    if (["gas-house", "heating"].includes(name)) {
+      return "fireplace";
+    }
+
+    if (["internet", "wifi"].includes(name)) {
+      return "wifi";
+    }
+
+    if (["water"].includes(name.toLowerCase())) {
+      return "faucet";
+    }
+
+    if (["gym", "gym-membership"].includes(name)) {
+      return "exercise";
+    }
+
+    if (["savings", "savings-account"].includes(name)) {
+      return "savings";
+    }
+
+    if (["transportation", "transport"].includes(name)) {
+      return "commute";
     }
   }
 }
