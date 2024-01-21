@@ -1,0 +1,1 @@
+This started out as my attempt to complete Challenge 21 from the Advent. The challenge was to implement "add" and "delete" functionality to a simple budget app. I accomplished both asks, then started building onto the app. Eventually I re-wrote the code from the ground up.
